@@ -1,5 +1,5 @@
 name: lr16_firebase_auth
-description: "LR16 — Firebase Authentication (sign up, login, logout, password reset, protected routes)."
+description: "LR16 Firebase Auth + LR17 Firestore notes (CRUD, real-time, user-specific)."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -36,6 +36,9 @@ dependencies:
   cupertino_icons: ^1.0.8
   firebase_core: ^4.10.0
   firebase_auth: ^6.5.2
+  cloud_firestore: ^6.5.0
+  firebase_ui_firestore: ^2.0.1
+  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/errors.dart';
+import 'notes_list_screen.dart';
 import 'profile_screen.dart';
 
 /// Protected home screen (TODO 6). Reachable only when a user is signed in
@@ -29,8 +31,12 @@ class HomeScreen extends StatelessWidget {
     );
 
     if (shouldLogout == true) {
-      await FirebaseAuth.instance.signOut();
-      // AuthWrapper switches back to LoginScreen automatically.
+      try {
+        await FirebaseAuth.instance.signOut();
+        // AuthWrapper switches back to LoginScreen automatically.
+      } catch (e) {
+        if (context.mounted) context.showSnackBar(describeError(e));
+      }
     }
   }
 
@@ -67,8 +73,6 @@ class HomeScreen extends StatelessWidget {
                 style: Theme.of(context).textTheme.bodyLarge,
               ),
               const SizedBox(height: 24),
-              // "You are logged in!" — the status checkmark is a real Material
-              // icon, not an emoji glyph in the text.
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -81,7 +85,17 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 32),
-              // Protected route demo: ProfileScreen guards itself when no user.
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const NotesListScreen()),
+                  );
+                },
+                icon: const Icon(Icons.notes),
+                label: const Text('My Notes'),
+              ),
+              const SizedBox(height: 12),
               ElevatedButton.icon(
                 onPressed: () {
                   Navigator.push(

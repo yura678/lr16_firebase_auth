@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,18 @@ Future<void> main() async {
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // The Firestore database id is `default` (what the Firebase console creates),
+  // so target it explicitly — FirebaseFirestore.instance defaults to the
+  // `(default)` database, which doesn't exist here, and reads/writes would hang.
+  FirebaseFirestore.instanceFor(
+    app: Firebase.app(),
+    databaseId: 'default',
+  ).settings = const Settings(
+    // Offline persistence (TODO 10): cache locally, sync when back online.
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
 
   runApp(const MyApp());

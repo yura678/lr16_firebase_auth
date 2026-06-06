@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/auth_errors.dart';
+import '../utils/errors.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -45,17 +45,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
       await credential.user?.updateDisplayName(_nameController.text.trim());
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Account created successfully!')),
-        );
+        context.showSnackBar('Account created successfully!');
         Navigator.pop(context);
       }
-    } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AuthErrors.getErrorMessage(e.code))),
-        );
-      }
+    } catch (e) {
+      if (mounted) context.showSnackBar(describeError(e));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

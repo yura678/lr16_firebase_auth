@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../screens/home_screen.dart';
 import '../screens/login_screen.dart';
+import '../utils/errors.dart';
 
 
 class AuthWrapper extends StatelessWidget {
@@ -21,7 +22,7 @@ class AuthWrapper extends StatelessWidget {
 
         if (snapshot.hasError) {
           return Scaffold(
-            body: Center(child: Text('Error: ${snapshot.error}')),
+            body: Center(child: Text(describeError(snapshot.error!))),
           );
         }
 

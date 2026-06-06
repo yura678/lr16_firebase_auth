@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../utils/auth_errors.dart';
+import '../utils/errors.dart';
 
 /// Password reset screen (TODO 7): sends a reset link via email.
 class ForgotPasswordScreen extends StatefulWidget {
@@ -36,12 +36,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (mounted) {
         setState(() => _emailSent = true);
       }
-    } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AuthErrors.getErrorMessage(e.code))),
-        );
-      }
+    } catch (e) {
+      if (mounted) context.showSnackBar(describeError(e));
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
