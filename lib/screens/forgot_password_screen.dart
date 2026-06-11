@@ -1,7 +1,10 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
 import '../utils/errors.dart';
+import '../utils/validators.dart';
+import '../widgets/centered_form.dart';
+import '../widgets/primary_button.dart';
 
 /// Password reset screen (TODO 7): sends a reset link via email.
 class ForgotPasswordScreen extends StatefulWidget {
@@ -13,6 +16,7 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
+  final AuthService _auth = AuthService();
   final _emailController = TextEditingController();
   bool _isLoading = false;
   bool _emailSent = false;
@@ -29,9 +33,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await FirebaseAuth.instance.sendPasswordResetEmail(
-        email: _emailController.text.trim(),
-      );
+      await _auth.sendPasswordReset(_emailController.text.trim());
 
       if (mounted) {
         setState(() => _emailSent = true);
@@ -49,9 +51,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Reset Password')),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: _emailSent ? _buildSuccessMessage() : _buildForm(),
+      body: CenteredForm(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: _emailSent ? _buildSuccessMessage() : _buildForm(),
+        ),
       ),
     );
   }
@@ -78,29 +82,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               prefixIcon: Icon(Icons.email),
               border: OutlineInputBorder(),
             ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Please enter your email';
-              }
-              if (!value.contains('@')) {
-                return 'Please enter a valid email';
-              }
-              return null;
-            },
+            validator: Validators.email,
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _resetPassword,
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-            ),
-            child: _isLoading
-                ? const SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2),
-                  )
-                : const Text('SEND RESET LINK'),
+          PrimaryButton(
+            label: 'SEND RESET LINK',
+            onPressed: _resetPassword,
+            isLoading: _isLoading,
           ),
         ],
       ),
@@ -113,10 +101,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       children: [
         const Icon(Icons.check_circle, size: 100, color: Colors.green),
         const SizedBox(height: 24),
-        Text(
-          'Email Sent!',
-          style: Theme.of(context).textTheme.headlineSmall,
-        ),
+        Text('Email Sent!', style: Theme.of(context).textTheme.headlineSmall),
         const SizedBox(height: 16),
         Text(
           'Check your email for a link to reset your password.',

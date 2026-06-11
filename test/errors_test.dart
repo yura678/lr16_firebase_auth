@@ -42,6 +42,15 @@ void main() {
       );
     });
 
+    test('maps Firebase Storage errors to friendly messages', () {
+      expect(
+        describeError(
+          FirebaseException(plugin: 'firebase_storage', code: 'unauthorized'),
+        ),
+        'You do not have permission to upload this file.',
+      );
+    });
+
     test('falls back to a generic message for arbitrary errors', () {
       expect(
         describeError(Exception('boom')),

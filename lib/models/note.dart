@@ -9,6 +9,8 @@ class Note {
   final DateTime updatedAt;
   final String userId;
 
+  final String? imageUrl;
+
   Note({
     required this.id,
     required this.title,
@@ -16,6 +18,7 @@ class Note {
     required this.createdAt,
     required this.updatedAt,
     required this.userId,
+    this.imageUrl,
   });
 
   factory Note.fromJson(Map<String, dynamic> json, String id) {
@@ -23,6 +26,7 @@ class Note {
       id: id,
       title: (json['title'] as String?) ?? '',
       content: (json['content'] as String?) ?? '',
+      imageUrl: json['imageUrl'] as String?,
       // serverTimestamp() resolves on the backend, so a freshly-created doc has
       // a null timestamp locally for a moment — parse null-safely instead of a
       // direct cast (which would throw during that window).
@@ -39,10 +43,11 @@ class Note {
       'createdAt': Timestamp.fromDate(createdAt),
       'updatedAt': Timestamp.fromDate(updatedAt),
       'userId': userId,
+      'imageUrl': imageUrl,
     };
   }
 
-  Note copyWith({String? title, String? content}) {
+  Note copyWith({String? title, String? content, String? imageUrl}) {
     return Note(
       id: id,
       title: title ?? this.title,
@@ -50,6 +55,7 @@ class Note {
       createdAt: createdAt,
       updatedAt: DateTime.now(),
       userId: userId,
+      imageUrl: imageUrl ?? this.imageUrl,
     );
   }
 }

@@ -1,10 +1,11 @@
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../models/note.dart';
-import '../services/firestore_service.dart';
+import '../services/notes_repository.dart';
 import '../utils/errors.dart';
+import '../widgets/centered_form.dart';
+import '../widgets/note_card.dart';
 import 'note_editor_screen.dart';
 
 /// Real-time list of the user's notes with create/edit/delete.
@@ -20,8 +21,7 @@ class NotesListScreen extends StatefulWidget {
 }
 
 class _NotesListScreenState extends State<NotesListScreen> {
-  final FirestoreService _service = FirestoreService();
-  final DateFormat _dateFormat = DateFormat('dd.MM.yyyy  HH:mm');
+  final NotesRepository _repo = NotesRepository();
 
   void _openEditor([Note? note]) {
     Navigator.push(
@@ -51,7 +51,7 @@ class _NotesListScreenState extends State<NotesListScreen> {
 
     if (shouldDelete != true) return;
     try {
-      await _service.deleteNote(note.id);
+      await _repo.deleteNote(note);
     } catch (e) {
       if (mounted) context.showSnackBar(describeError(e));
     }
@@ -66,62 +66,36 @@ class _NotesListScreenState extends State<NotesListScreen> {
         tooltip: 'Add note',
         child: const Icon(Icons.add),
       ),
-      body: FirestoreListView<Note>(
-        query: _service.notesQuery(),
-        pageSize: 10,
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        loadingBuilder: (context) =>
-            const Center(child: CircularProgressIndicator()),
-        errorBuilder: (context, error, _) =>
-            Center(child: Text(describeError(error))),
-        emptyBuilder: (context) => const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.note_alt_outlined, size: 80, color: Colors.grey),
-              SizedBox(height: 16),
-              Text('No notes yet'),
-              SizedBox(height: 4),
-              Text('Tap + to create your first note'),
-            ],
-          ),
-        ),
-        itemBuilder: (context, snapshot) {
-          final note = snapshot.data();
-          return Card(
-            margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            child: ListTile(
-              leading: const Icon(Icons.sticky_note_2),
-              title: Text(
-                note.title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-              isThreeLine: true,
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    note.content,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _dateFormat.format(note.updatedAt),
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
-              ),
-              onTap: () => _openEditor(note),
-              trailing: IconButton(
-                icon: const Icon(Icons.delete, color: Colors.red),
-                tooltip: 'Delete',
-                onPressed: () => _confirmDelete(note),
-              ),
+      body: CenteredForm(
+        child: FirestoreListView<Note>(
+          query: _repo.notesQuery(),
+          pageSize: 10,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          loadingBuilder: (context) =>
+              const Center(child: CircularProgressIndicator()),
+          errorBuilder: (context, error, _) =>
+              Center(child: Text(describeError(error))),
+          emptyBuilder: (context) => const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.note_alt_outlined, size: 80, color: Colors.grey),
+                SizedBox(height: 16),
+                Text('No notes yet'),
+                SizedBox(height: 4),
+                Text('Tap + to create your first note'),
+              ],
             ),
-          );
-        },
+          ),
+          itemBuilder: (context, snapshot) {
+            final note = snapshot.data();
+            return NoteCard(
+              note: note,
+              onTap: () => _openEditor(note),
+              onDelete: () => _confirmDelete(note),
+            );
+          },
+        ),
       ),
     );
   }

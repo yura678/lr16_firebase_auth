@@ -19,6 +19,16 @@ String describeError(Object error) {
         return 'The requested data was not found.';
       case 'deadline-exceeded':
         return 'The request timed out. Please try again.';
+      case 'unauthorized':
+        return 'You do not have permission to upload this file.';
+      case 'canceled':
+        return 'Upload canceled.';
+      case 'quota-exceeded':
+        return 'Storage quota exceeded.';
+      case 'object-not-found':
+        return 'File not found.';
+      case 'retry-limit-exceeded':
+        return 'Upload timed out. Please try again.';
       default:
         return 'A database error occurred. Please try again.';
     }
@@ -58,8 +68,6 @@ String _authMessage(String code) {
 /// boilerplate.
 extension SnackBarMessenger on BuildContext {
   void showSnackBar(String message) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(content: Text(message)),
-    );
+    ScaffoldMessenger.of(this).showSnackBar(SnackBar(content: Text(message)));
   }
 }

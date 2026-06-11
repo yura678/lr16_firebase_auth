@@ -58,5 +58,17 @@ void main() {
       expect(edited.createdAt, note.createdAt);
       expect(edited.updatedAt.isAfter(note.updatedAt), isTrue);
     });
+
+    test('imageUrl round-trips through toJson/fromJson', () {
+      final withImage = note.copyWith(imageUrl: 'https://example.com/a.jpg');
+      final restored = Note.fromJson(withImage.toJson(), withImage.id);
+      expect(restored.imageUrl, 'https://example.com/a.jpg');
+    });
+
+    test('imageUrl defaults to null when absent', () {
+      expect(note.imageUrl, isNull);
+      final restored = Note.fromJson(note.toJson(), note.id);
+      expect(restored.imageUrl, isNull);
+    });
   });
 }

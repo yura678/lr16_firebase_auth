@@ -1,6 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../services/auth_service.dart';
 import '../utils/errors.dart';
 import 'notes_list_screen.dart';
 import 'profile_screen.dart';
@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
 
     if (shouldLogout == true) {
       try {
-        await FirebaseAuth.instance.signOut();
+        await AuthService().signOut();
         // AuthWrapper switches back to LoginScreen automatically.
       } catch (e) {
         if (context.mounted) context.showSnackBar(describeError(e));
@@ -42,7 +42,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser!;
+    final user = AuthService().currentUser!;
 
     return Scaffold(
       appBar: AppBar(

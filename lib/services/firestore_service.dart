@@ -21,14 +21,22 @@ class FirestoreService {
     return _firestore.collection('users').doc(user.uid).collection('notes');
   }
 
-  Future<void> createNote(String title, String content) async {
+  String newNoteId() => _notesRef().doc().id;
+
+  Future<void> createNote(
+    String id,
+    String title,
+    String content, {
+    String? imageUrl,
+  }) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) throw Exception('User not logged in');
 
-    await _notesRef().add({
+    await _notesRef().doc(id).set({
       'title': title,
       'content': content,
       'userId': user.uid,
+      'imageUrl': imageUrl,
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     });
@@ -55,10 +63,16 @@ class FirestoreService {
         );
   }
 
-  Future<void> updateNote(String noteId, String title, String content) async {
+  Future<void> updateNote(
+    String noteId,
+    String title,
+    String content, {
+    String? imageUrl,
+  }) async {
     await _notesRef().doc(noteId).update({
       'title': title,
       'content': content,
+      'imageUrl': imageUrl,
       'updatedAt': FieldValue.serverTimestamp(),
     });
   }
